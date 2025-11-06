@@ -8,7 +8,7 @@ from ultralytics import YOLO
 
 def parse_args() -> argparse.Namespace:
 	project_root = Path(__file__).resolve().parent
-	default_weights = project_root.parent / "runs" / "yolo-nano-ball-optim" / "weights" / "best.pt"
+	default_weights = project_root.parent / "runs" / "yolo11n-rpi-416" / "weights" / "best.pt"
 	default_source = project_root.parent / "Dataset" / "video" / "06e36a63e4befd4c8ecace67178b66ca.mp4"
 	parser = argparse.ArgumentParser(description="Run YOLO detection on a video and display with OpenCV")
 	parser.add_argument("--source", type=str, default=str(default_source), help="Path to input video file")
@@ -18,6 +18,7 @@ def parse_args() -> argparse.Namespace:
 	parser.add_argument("--device", type=str, default="cpu")
 	parser.add_argument("--save", action="store_true", help="Save annotated video")
 	parser.add_argument("--out", type=str, default="out.mp4", help="Output video path when --save is set")
+	parser.add_argument("--gray", action="store_true", help="Convert frames to grayscale for detection and drawing")
 	return parser.parse_args()
 
 
@@ -42,8 +43,14 @@ def main() -> None:
 		ok, frame = cap.read()
 		if not ok:
 			break
-		res = model.predict(source=frame, imgsz=args.imgsz, conf=args.conf, device=args.device, verbose=False)
-		plot = res[0].plot()
+		if args.gray:
+			g = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+			inp = cv2.cvtColor(g, cv2.COLOR_GRAY2BGR)
+			res = model.predict(source=inp, imgsz=args.imgsz, conf=args.conf, device=args.device, verbose=False)
+			plot = res[0].plot()
+		else:
+			res = model.predict(source=frame, imgsz=args.imgsz, conf=args.conf, device=args.device, verbose=False)
+			plot = res[0].plot()
 		now = time.time()
 		cur_fps = 1.0 / max(1e-3, now - prev_t)
 		prev_t = now

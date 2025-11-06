@@ -7,14 +7,13 @@ from ultralytics import YOLO
 def parse_args() -> argparse.Namespace:
 	parser = argparse.ArgumentParser(description="Run YOLO predictions on dataset images and save annotated outputs.")
 	project_root = Path(__file__).resolve().parent.parent
-	default_weights = project_root / "runs" / "yolo-nano-ball-optim" / "weights" / "best.pt"
-	# Predict over the original dataset images by default
-	default_source_train = project_root / "Dataset" / "training"
-	default_source_val = project_root / "Dataset" / "testing"
+	default_weights = project_root / "runs" / "yolo11n-rpi-416" / "weights" / "best.pt"
+	# Predict over yolo-data images by default (supports flat layout)
+	default_source_images = project_root / "yolo-data" / "images"
 	default_outdir = project_root / "predictions"
 
 	parser.add_argument("--weights", type=str, default=str(default_weights), help="Path to model weights .pt")
-	parser.add_argument("--sources", type=str, nargs="*", default=[str(default_source_val), str(default_source_train)], help="Image folder(s) or file(s) to run inference on")
+	parser.add_argument("--sources", type=str, nargs="*", default=[str(default_source_images)], help="Image folder(s) or file(s) to run inference on")
 	parser.add_argument("--outdir", type=str, default=str(default_outdir), help="Root directory to save annotated results")
 	parser.add_argument("--imgsz", type=int, default=640, help="Inference image size")
 	parser.add_argument("--conf", type=float, default=0.25, help="Confidence threshold")

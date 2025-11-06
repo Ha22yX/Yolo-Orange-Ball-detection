@@ -9,11 +9,12 @@ from ultralytics import YOLO
 def parse_args() -> argparse.Namespace:
 	project_root = Path(__file__).resolve().parent.parent
 	parser = argparse.ArgumentParser(description="Webcam detection using trained YOLO model")
-	parser.add_argument("--weights", type=str, default=str(project_root / "runs" / "yolo-nano-ball-optim" / "weights" / "best.pt"))
+	parser.add_argument("--weights", type=str, default=str(project_root / "runs" / "yolo11n-gray2" / "weights" / "best.pt"))
 	parser.add_argument("--cam", type=int, default=0, help="Webcam index")
 	parser.add_argument("--imgsz", type=int, default=640)
 	parser.add_argument("--conf", type=float, default=0.25, help="Confidence threshold (minimum enforced at 0.25)")
 	parser.add_argument("--device", type=str, default="cpu", help="cpu or CUDA index like 0")
+	parser.add_argument("--gray", action="store_true", help="Convert frames to grayscale for detection and drawing")
 	return parser.parse_args()
 
 
@@ -33,8 +34,14 @@ def main() -> None:
 				break
 			# Enforce minimum confidence of 0.8 for drawing results
 			used_conf = max(0.8, float(args.conf))
-			res = model.predict(source=frame, imgsz=args.imgsz, conf=used_conf, device=args.device, verbose=False)
-			plot = res[0].plot()
+			if args.gray:
+				g = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+				inp = cv2.cvtColor(g, cv2.COLOR_GRAY2BGR)
+				res = model.predict(source=inp, imgsz=args.imgsz, conf=used_conf, device=args.device, verbose=False)
+				plot = res[0].plot()
+			else:
+				res = model.predict(source=frame, imgsz=args.imgsz, conf=used_conf, device=args.device, verbose=False)
+				plot = res[0].plot()
 			now = time.time()
 			fps = 1.0 / max(1e-3, now - prev_t)
 			prev_t = now
