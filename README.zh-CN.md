@@ -1,11 +1,13 @@
 <div align="center">
   <h1>YOLO Orange Ball Detection</h1>
-  <p>用于橙色球目标检测的 YOLO 训练与推理实验，包含数据集、模型权重和摄像头脚本。</p>
+  <p>一个橙色球体检测实验仓库，包含 YOLO 数据集、训练脚本、权重、ONNX 导出和摄像头推理工具。</p>
 
   <p>
     <a href="README.md">English</a>
     &middot;
     <a href="#快速开始">快速开始</a>
+    &middot;
+    <a href="#核心能力">核心能力</a>
     &middot;
     <a href="#技术栈">技术栈</a>
   </p>
@@ -26,26 +28,30 @@
   <img src="Tarining/runs/yolo11n-rpi-416/val_batch0_pred.jpg" alt="YOLO 验证预测示例" width="49%" />
 </p>
 
-## 项目价值
+## 项目概览
 
-颜色阈值检测很有用，但学习式检测更能适应光照、背景和相机角度变化。本仓库把橙色球检测的数据集、训练脚本、模型权重和推理工具放在一起。
+这个仓库把橙色球体的学习式检测路线放在一起：数据集、训练脚本、已训练权重、验证输出、ONNX 导出和摄像头推理工具。
 
-## 工作流
+它与传统 OpenCV 检测器互补：当光照、背景和视角变化较大，简单颜色阈值不够稳定时，可以使用 YOLO。
 
-- 准备 YOLO 格式的彩色或灰度数据集。
-- 使用 Ultralytics 脚本训练小型 YOLO 模型。
-- 用训练好的权重进行摄像头、视频或数据集推理。
-- 导出 ONNX 以便进行轻量运行时实验。
-- 使用 ESP32-S3 摄像头串口脚本做嵌入式采集测试。
+## 核心能力
 
-## 核心功能
+- YOLO 格式数据集和已训练模型文件。
+- 训练、摄像头推理、视频推理、ONNX 导出和 ONNX Runtime 脚本。
+- 保留验证图片和训练指标，便于复现实验。
+- ESP32-S3 摄像头串口草图，用于嵌入式采集实验。
+- 从数据标注到实时模型测试的完整实验路径。
 
-- YOLO 格式数据集和训练权重。
-- 训练、摄像头、视频、ONNX 导出和 ONNX 推理脚本。
-- 随实验保存验证指标和预测图片。
-- 用于硬件侧采集的 ESP32-S3 摄像头串口实验。
+## 工作方式
+
+1. 准备 YOLO 格式图片和标签。
+2. 训练或复用一个轻量 Ultralytics YOLO 模型。
+3. 用摄像头/视频或导出的 ONNX 模型运行推理。
+4. 在机器人实验使用权重前，先对比验证预测和训练指标。
 
 ## 快速开始
+
+可以用下面的命令在本地运行项目。
 
 ```bash
 git clone https://github.com/Ha22yX/Yolo-Orange-Ball-detection.git
@@ -54,26 +60,44 @@ pip install ultralytics opencv-python onnxruntime numpy pillow pyserial
 python Tarining/scripts/webcam_detect.py --weights Tarining/runs/yolo11n-rpi-416/weights/best.pt --cam 0
 ```
 
-目录名 `Tarining` 保持原样，因为已有实验路径依赖它。
+`Tarining` 文件夹名保留不改，因为已有实验路径依赖这个名称。
+
+## 配置项
+
+| 项目 | 作用 |
+| --- | --- |
+| 模型权重 | 把脚本指向 `best.pt`、`yolo11n.pt` 或导出的 ONNX 文件。 |
+| 摄像头编号 | 使用脚本参数或 OpenCV 设备编号匹配本机摄像头。 |
+| 数据集路径 | 训练前确保 `data.yaml`、图片和标签一致。 |
+| 嵌入式采集 | 使用 Arduino 草图前先确认串口波特率和帧格式。 |
 
 ## 技术栈
 
 | 层级 | 技术 | 作用 |
 | --- | --- | --- |
-| 模型 | YOLO / Ultralytics | 训练和检测脚本。 |
+| 模型 | YOLO / Ultralytics | 训练和检测流程。 |
 | 推理 | OpenCV, ONNX Runtime | 摄像头/视频推理和导出模型测试。 |
-| 数据 | YOLO dataset format | 图像、标签和 data.yaml 文件。 |
-| 嵌入式 | ESP32-S3 camera | 串口图像实验。 |
+| 数据 | YOLO dataset format | 图片、标签和 `data.yaml`。 |
+| 嵌入式 | ESP32-S3 camera | 串口采集实验。 |
 
 ## 项目结构
 
 ```text
-Tarining/scripts/              training, inference, export, and serial tools
-Tarining/yolo-data/            YOLO-format dataset
-Tarining/runs/yolo11n-rpi-416/ experiment outputs and weights
-arduino/                       ESP32-S3 camera serial sketch
+Tarining/scripts/              训练、推理、导出和串口工具
+Tarining/Dataset/              YOLO 格式数据集示例
+Tarining/runs/yolo11n-rpi-416/ 实验输出和权重
+arduino/                       ESP32-S3 摄像头串口草图
+.github/assets/                README 概览图
 ```
 
-## 项目说明
+## 项目状态
 
-数据集和模型文件保留在仓库中以便复现实验。后续更大的数据集建议放到 Releases 或外部存储。
+这是研究/实验仓库。模型文件保留在仓库中方便复现；未来更大的数据集建议迁移到 Releases 或外部存储。
+
+## 相关项目
+
+- [OrangeBall-Detection-with-OpenCV](https://github.com/Ha22yX/OrangeBall-Detection-with-OpenCV) - 同一目标的传统视觉检测器。
+
+## 许可证
+
+当前仓库尚未声明项目级开源许可证；公开复用或分发前建议先补充 License。
