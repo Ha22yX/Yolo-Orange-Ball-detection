@@ -21,9 +21,29 @@
   <img src=".github/assets/readme-hero.svg" alt="YOLO Orange Ball Detection overview image" width="100%" />
 </p>
 
+<p align="center">
+  <img src="Tarining/runs/yolo11n-rpi-416/results.png" alt="YOLO training metrics" width="49%" />
+  <img src="Tarining/runs/yolo11n-rpi-416/val_batch0_pred.jpg" alt="YOLO validation prediction examples" width="49%" />
+</p>
+
 ## Why This Exists
 
-Color thresholding is useful, but learned detection can handle more background variation. This repo keeps the orange-ball dataset, training scripts, exported weights, and camera experiments together.
+Color-based detection is useful, but learned detectors handle more variation in lighting, background, and camera angle. This repo keeps the dataset, training scripts, model weights, and inference tools together for orange-ball detection experiments.
+
+## Workflow
+
+- Prepare YOLO-format color or grayscale datasets.
+- Train a small YOLO model with Ultralytics scripts.
+- Run webcam/video/dataset inference with trained weights.
+- Export to ONNX for lighter runtime experiments.
+- Use ESP32-S3 camera serial scripts for embedded capture tests.
+
+## Features
+
+- YOLO-format datasets and trained weights.
+- Training, webcam, video, ONNX export, and ONNX inference scripts.
+- Validation metrics and prediction images kept with the experiment run.
+- ESP32-S3 camera serial experiment for hardware-side capture.
 
 ## Quickstart
 
@@ -34,14 +54,7 @@ pip install ultralytics opencv-python onnxruntime numpy pillow pyserial
 python Tarining/scripts/webcam_detect.py --weights Tarining/runs/yolo11n-rpi-416/weights/best.pt --cam 0
 ```
 
-The folder name `Tarining` is kept as-is because existing paths depend on it.
-
-## Features
-
-- YOLO-format color and grayscale orange-ball datasets.
-- Training, webcam, video, ONNX export, and ONNX video inference scripts.
-- Included YOLO weights for reproducing current experiments.
-- ESP32-S3 camera serial experiment for embedded capture tests.
+The folder name `Tarining` is kept as-is because existing experiment paths depend on it.
 
 ## Tech Stack
 
@@ -52,7 +65,15 @@ The folder name `Tarining` is kept as-is because existing paths depend on it.
 | Data | YOLO dataset format | Images, labels, and data.yaml files. |
 | Embedded | ESP32-S3 camera | Serial frame experiments. |
 
+## Project Map
 
-## Project Notes
+```text
+Tarining/scripts/              training, inference, export, and serial tools
+Tarining/yolo-data/            YOLO-format dataset
+Tarining/runs/yolo11n-rpi-416/ experiment outputs and weights
+arduino/                       ESP32-S3 camera serial sketch
+```
 
-This is an experiment repository with datasets and model artifacts checked in for reproducibility. For a larger release, move heavy weights/datasets to GitHub Releases or external storage.
+## Notes
+
+Datasets and model artifacts are kept in the repository for reproducibility. Large future datasets should move to Releases or external storage.
